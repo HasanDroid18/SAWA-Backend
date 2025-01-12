@@ -4,6 +4,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const axios = require("axios"); // Import Axios
+const dotenv = require("dotenv");
+dotenv.config();
 
 const authRouter = require("./routers/authRouter");
 const postsRouter = require("./routers/postsRouter");
@@ -34,23 +36,23 @@ app.get("/api/hospitals", async (req, res) => {
     );
     const hospitals = response.data;
 
-		// Extract relevant attributes
-		const filteredHospitals = hospitals.map(hospital => ({
-			type: hospital.type,
-			name: hospital.name ,
-			region: hospital.info?.region || 'N/A',
-			latitude: hospital.info?.latitude || null,
-			longitude: hospital.info?.longitude || null,
-			address: hospital.info?.address || 'N/A',
-			phone: hospital.info?.phone_numbers?.[0]?.number || 'N/A',
-			doctor: hospital.info?.doctor || 'N/A',
-			doctor_phone: hospital.info?.doctor_phone || 'N/A',
-			responsible: hospital.info?.responsible || 'N/A',
-			responsible_phone: hospital.info?.responsible_phone || 'N/A',
-		}));
+    // Extract relevant attributes
+    const filteredHospitals = hospitals.map((hospital) => ({
+      type: hospital.type,
+      name: hospital.name,
+      region: hospital.info?.region || "N/A",
+      latitude: hospital.info?.latitude || null,
+      longitude: hospital.info?.longitude || null,
+      address: hospital.info?.address || "N/A",
+      phone: hospital.info?.phone_numbers?.[0]?.number || "N/A",
+      doctor: hospital.info?.doctor || "N/A",
+      doctor_phone: hospital.info?.doctor_phone || "N/A",
+      responsible: hospital.info?.responsible || "N/A",
+      responsible_phone: hospital.info?.responsible_phone || "N/A",
+    }));
 
-		res.json(filteredHospitals); // Send the filtered data to the client
-    } catch (error) {
+    res.json(filteredHospitals); // Send the filtered data to the client
+  } catch (error) {
     console.error("Error fetching data from MOPH API:", error.message);
     res.status(500).json({ error: "Failed to fetch data from MOPH API" });
   }
