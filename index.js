@@ -5,10 +5,12 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const axios = require("axios"); // Import Axios
 const dotenv = require("dotenv");
+const path = require("path");
 dotenv.config();
 
-const authRouter = require("./routers/authRouter");
-const postsRouter = require("./routers/postsRouter");
+const authRouter = require("./routes/authRouter");
+const postsRouter = require("./routes/postsRouter");
+const donationRouter = require("./routes/donationRouter");
 
 const app = express();
 app.use(cors());
@@ -28,6 +30,10 @@ mongoose
 
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
+app.use("/api/donations", donationRouter);
+// Serve static files from the 'uploads' directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 app.get("/api/hospitals", async (req, res) => {
   try {
@@ -57,6 +63,7 @@ app.get("/api/hospitals", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch data from MOPH API" });
   }
 });
+
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server" });
 });
