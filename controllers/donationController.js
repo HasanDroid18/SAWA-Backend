@@ -9,6 +9,14 @@ const createDonation = async (req, res) => {
       req.body;
     const donationItemImage = req.file.path; // File path for the image
 
+    // Check for duplicate donation item name
+    const existingDonation = await Donation.findOne({ donationItemName });
+    if (existingDonation) {
+      return res
+        .status(400)
+        .json({ error: "Donation with this name already exists" });
+    }
+
     const donation = new Donation({
       donationItemName,
       donationItemImage,
@@ -50,26 +58,31 @@ const getDonationById = async (req, res) => {
 // Update a donation by ID (Admin-only)
 const updateDonation = async (req, res) => {
   try {
-    const { donationItemName, donationItemPrice, description, quantity } = req.body;
+    const { donationItemName, donationItemPrice, description, quantity } =
+      req.body;
     const donation = await Donation.findById(req.params.id);
 
     if (!donation) {
-      return res.status(404).json({ error: 'Donation not found' });
+      return res.status(404).json({ error: "Donation not found" });
     }
 
     if (req.file) {
       // Check if the old image file exists before deleting
       if (donation.donationItemImage) {
-        const oldImagePath = path.join(__dirname, '..', donation.donationItemImage);
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          donation.donationItemImage
+        );
 
         if (fs.existsSync(oldImagePath)) {
           fs.unlink(oldImagePath, (err) => {
             if (err) {
-              console.error('Error deleting old image:', err);
+              console.error("Error deleting old image:", err);
             }
           });
         } else {
-          console.warn('Old image file does not exist, skipping deletion.');
+          console.warn("Old image file does not exist, skipping deletion.");
         }
       }
 
@@ -77,7 +90,8 @@ const updateDonation = async (req, res) => {
     }
 
     donation.donationItemName = donationItemName || donation.donationItemName;
-    donation.donationItemPrice = donationItemPrice || donation.donationItemPrice;
+    donation.donationItemPrice =
+      donationItemPrice || donation.donationItemPrice;
     donation.description = description || donation.description;
     donation.quantity = quantity || donation.quantity;
 
@@ -113,69 +127,10 @@ const deleteDonation = async (req, res) => {
   }
 };
 
-// Request a donation (User)
-// const requestDonation = async (req, res) => {
-//   try {
-//     const donation = await Donation.findById(req.params.id);
-//     if (!donation) {
-//       return res.status(404).json({ error: 'Donation not found' });
-//     }
-
-//     const userId = req.user.id; // Assuming you have user info in req.user
-//     if (donation.requestedBy.includes(userId)) {
-//       return res.status(400).json({ error: 'You have already requested this donation' });
-//     }
-
-//     donation.requestedBy.push(userId);
-//     await donation.save();
-//     res.status(200).json(donation);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-// Donate for a donation item (User)
-// const donateForDonation = async (req, res) => {
-//   try {
-//     const { amount } = req.body;
-//     const invoiceImage = req.file.path; // File path for the invoice/payment proof
-
-//     const donation = await Donation.findById(req.params.id);
-//     if (!donation) {
-//       return res.status(404).json({ error: 'Donation not found' });
-//     }
-
-//     const userId = req.user.id; // Assuming you have user info in req.user
-
-//     // Add the donation to the donations array
-//     donation.donations.push({
-//       donor: userId,
-//       amount,
-//       invoiceImage,
-//     });
-
-//     // Update the total donated amount
-//     donation.totalDonatedAmount += amount;
-
-//     // Reduce the quantity if the total donated amount meets the item price
-//     if (donation.totalDonatedAmount >= donation.donationItemPrice) {
-//       donation.quantity -= 1;
-//       donation.totalDonatedAmount = 0; // Reset for the next item
-//     }
-
-//     await donation.save();
-//     res.status(200).json(donation);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
 module.exports = {
   createDonation,
   getAllDonations,
   getDonationById,
   deleteDonation,
-  updateDonation,
-  // requestDonation,
-  // donateForDonation,
+  updateDonation
 };
