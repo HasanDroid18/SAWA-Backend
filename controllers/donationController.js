@@ -1,13 +1,14 @@
 const Donation = require("../models/donationModel");
 const fs = require("fs");
 const path = require("path");
+const multer = require("multer");
+const upload = require("../config/multer");
 
 // Create a new donation (Admin-only)
 const createDonation = async (req, res) => {
   try {
     const { donationItemName, donationItemPrice, description, quantity } =
       req.body;
-    const donationItemImage = req.file.path; // File path for the image
 
     // Check for duplicate donation item name
     const existingDonation = await Donation.findOne({ donationItemName });
@@ -17,16 +18,24 @@ const createDonation = async (req, res) => {
         .json({ error: "Donation with this name already exists" });
     }
 
-    const donation = new Donation({
-      donationItemName,
-      donationItemImage,
-      donationItemPrice,
-      description,
-      quantity,
-    });
+    upload.single("donationItemImage")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
+      }
 
-    await donation.save();
-    res.status(201).json(donation);
+      const donationItemImage = req.file.path; // File path for the image
+
+      const donation = new Donation({
+        donationItemName,
+        donationItemImage,
+        donationItemPrice,
+        description,
+        quantity,
+      });
+
+      await donation.save();
+      res.status(201).json(donation);
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -66,37 +75,43 @@ const updateDonation = async (req, res) => {
       return res.status(404).json({ error: "Donation not found" });
     }
 
-    if (req.file) {
-      // Check if the old image file exists before deleting
-      if (donation.donationItemImage) {
-        const oldImagePath = path.join(
-          __dirname,
-          "..",
-          donation.donationItemImage
-        );
-
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlink(oldImagePath, (err) => {
-            if (err) {
-              console.error("Error deleting old image:", err);
-            }
-          });
-        } else {
-          console.warn("Old image file does not exist, skipping deletion.");
-        }
+    upload.single("donationItemImage")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: err.message });
       }
 
-      donation.donationItemImage = req.file.path;
-    }
+      if (req.file) {
+        // Check if the old image file exists before deleting
+        if (donation.donationItemImage) {
+          const oldImagePath = path.join(
+            __dirname,
+            "..",
+            donation.donationItemImage
+          );
 
-    donation.donationItemName = donationItemName || donation.donationItemName;
-    donation.donationItemPrice =
-      donationItemPrice || donation.donationItemPrice;
-    donation.description = description || donation.description;
-    donation.quantity = quantity || donation.quantity;
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlink(oldImagePath, (err) => {
+              if (err) {
+                console.error("Error deleting old image:", err);
+              }
+            });
+          } else {
+            console.warn("Old image file does not exist, skipping deletion.");
+          }
+        }
 
-    await donation.save();
-    res.status(200).json(donation);
+        donation.donationItemImage = req.file.path;
+      }
+
+      donation.donationItemName = donationItemName || donation.donationItemName;
+      donation.donationItemPrice =
+        donationItemPrice || donation.donationItemPrice;
+      donation.description = description || donation.description;
+      donation.quantity = quantity || donation.quantity;
+
+      await donation.save();
+      res.status(200).json(donation);
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -132,5 +147,5 @@ module.exports = {
   getAllDonations,
   getDonationById,
   deleteDonation,
-  updateDonation
+  updateDonation,
 };

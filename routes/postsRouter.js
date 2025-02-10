@@ -4,7 +4,7 @@ const { identifier } = require("../middlewares/identification");
 const router = express.Router();
 
 router.get("/all-posts", postsController.getPosts);
-router.get("/single-post", postsController.singlePost);
+router.get("/single-post/:id", postsController.singlePost); // Updated route to use req.params
 router.post("/create-post", identifier, postsController.createPost);
 
 router.put("/update-post/:id", identifier, postsController.updatePost);

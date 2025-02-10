@@ -1,6 +1,8 @@
 const { createPostSchema } = require("../middlewares/validator");
 const Post = require("../models/postsModel");
-const upload = require("../config/multer");
+const upload = require("../config/multerPostImages");
+const fs = require("fs");
+const path = require("path");
 
 exports.getPosts = async (req, res) => {
   const { page } = req.query;
@@ -28,10 +30,10 @@ exports.getPosts = async (req, res) => {
 };
 
 exports.singlePost = async (req, res) => {
-  const { _id } = req.query;
+  const { id } = req.params;
 
   try {
-    const existingPost = await Post.findOne({ _id }).populate({
+    const existingPost = await Post.findById(id).populate({
       path: "userId",
       select: "email",
     });
@@ -116,11 +118,23 @@ exports.updatePost = async (req, res) => {
           .json({ success: false, message: "Unauthorized" });
       }
 
-      existingPost.title = title;
-      existingPost.description = description;
+      // Delete old images if new images are uploaded
       if (images.length > 0) {
+        existingPost.images.forEach((imagePath) => {
+          const fullPath = path.join(__dirname, "..", imagePath);
+          if (fs.existsSync(fullPath)) {
+            fs.unlink(fullPath, (err) => {
+              if (err) {
+                console.error("Error deleting old image:", err);
+              }
+            });
+          }
+        });
         existingPost.images = images;
       }
+
+      existingPost.title = title;
+      existingPost.description = description;
 
       const result = await existingPost.save();
       res.status(200).json({ success: true, message: "Updated", data: result });
@@ -144,6 +158,18 @@ exports.deletePost = async (req, res) => {
     if (existingPost.userId.toString() !== userId) {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
+
+    // Delete associated images
+    existingPost.images.forEach((imagePath) => {
+      const fullPath = path.join(__dirname, "..", imagePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error("Error deleting image:", err);
+          }
+        });
+      }
+    });
 
     await Post.deleteOne({ _id: id });
     res.status(200).json({ success: true, message: "deleted" });
