@@ -11,6 +11,7 @@ dotenv.config();
 const authRouter = require("./routes/authRouter");
 const postsRouter = require("./routes/postsRouter");
 const donationRouter = require("./routes/donationRouter");
+const createDefaultAdmin = require("./utils/createDefaultAdmin");
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,7 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Database connected");
+    createDefaultAdmin(); // Run the script to create a default admin
   })
   .catch((err) => {
     console.log(err);
@@ -33,7 +35,6 @@ app.use("/api/posts", postsRouter);
 app.use("/api/donations", donationRouter);
 // Serve static files from the 'uploads' directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 
 app.get("/api/hospitals", async (req, res) => {
   try {

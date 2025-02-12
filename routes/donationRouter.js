@@ -2,10 +2,14 @@ const express = require("express");
 const router = express.Router();
 const donationController = require("../controllers/donationController");
 const upload = require("../config/multer");
+const { identifier } = require("../middlewares/identification");
+const checkRole = require("../middlewares/roleCheck");
 
 // Create a new donation (Admin-only)
 router.post(
   "/create-donation",
+  identifier,
+  checkRole(["Admin,SubAdmin"]),
   upload.single("donationItemImage"),
   donationController.createDonation
 );
@@ -17,11 +21,18 @@ router.get("/get-all-donations", donationController.getAllDonations);
 router.get("/get-donation/:id", donationController.getDonationById);
 
 // Delete a donation by ID (Admin-only)
-router.delete("/delete-donation/:id", donationController.deleteDonation);
+router.delete(
+  "/delete-donation/:id",
+  identifier,
+  checkRole(["Admin,SubAdmin"]),
+  donationController.deleteDonation
+);
 
 // Update a donation by ID (Admin-only)
 router.put(
   "/update-donation/:id",
+  identifier,
+  checkRole(["Admin,SubAdmin"]),
   upload.single("donationItemImage"),
   donationController.updateDonation
 );
