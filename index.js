@@ -11,6 +11,7 @@ dotenv.config();
 const authRouter = require("./routes/authRouter");
 const postsRouter = require("./routes/postsRouter");
 const donationRouter = require("./routes/donationRouter");
+const dashboardRouter = require("./routes/dashboardRouter");
 const createDefaultAdmin = require("./utils/createDefaultAdmin");
 
 const app = express();
@@ -30,11 +31,13 @@ mongoose
     console.log(err);
   });
 
+// Serve static files from the 'uploads' directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/donations", donationRouter);
-// Serve static files from the 'uploads' directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/home", dashboardRouter);
+
 
 app.get("/api/hospitals", async (req, res) => {
   try {
