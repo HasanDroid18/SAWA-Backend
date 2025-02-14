@@ -5,12 +5,20 @@ const upload = require("../config/multer");
 const { identifier } = require("../middlewares/identification");
 const checkRole = require("../middlewares/roleCheck");
 
-// Create a new donation (Admin-only)
+// Create a new donation (Admin and SubAdmin)
 router.post(
   "/create-donation",
   identifier,
-  checkRole(["Admin,SubAdmin"]),
+  checkRole(["Admin", "SubAdmin"]),
   upload.single("donationItemImage"),
+  (req, res, next) => {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "File is required" });
+    }
+    next();
+  },
   donationController.createDonation
 );
 
@@ -20,20 +28,28 @@ router.get("/get-all-donations", donationController.getAllDonations);
 // Get a single donation by ID (Public)
 router.get("/get-donation/:id", donationController.getDonationById);
 
-// Delete a donation by ID (Admin-only)
+// Delete a donation by ID (Admin and SubAdmin)
 router.delete(
   "/delete-donation/:id",
   identifier,
-  checkRole(["Admin,SubAdmin"]),
+  checkRole(["Admin", "SubAdmin"]),
   donationController.deleteDonation
 );
 
-// Update a donation by ID (Admin-only)
+// Update a donation by ID (Admin and SubAdmin)
 router.put(
   "/update-donation/:id",
   identifier,
-  checkRole(["Admin,SubAdmin"]),
+  checkRole(["Admin", "SubAdmin"]),
   upload.single("donationItemImage"),
+  (req, res, next) => {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "File is required" });
+    }
+    next();
+  },
   donationController.updateDonation
 );
 

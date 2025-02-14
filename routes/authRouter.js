@@ -26,10 +26,21 @@ router.delete(
   checkRole(["Admin"]),
   authController.deleteUser
 ); // Route to delete a user by ID
-router.patch("/update-user-role/:id",identifier,checkRole(["Admin"]),authController.promoteOrDemoteUser); // Route to promote or demote a user
+router.patch(
+  "/update-user-role/:id",
+  identifier,
+  checkRole(["Admin"]),
+  authController.promoteOrDemoteUser
+); // Route to promote or demote a user
 
 router.patch("/change-password", identifier, authController.changePassword);
-router.patch("/send-forgot-password-code",authController.sendForgotPasswordCode);
-router.patch("/verify-forgot-password-code",authController.verifyForgotPasswordCode);
+router.patch(
+  "/send-forgot-password-code",
+  authController.sendForgotPasswordCode
+);
+router.patch(
+  "/verify-forgot-password-code",
+  authController.verifyForgotPasswordCode
+);
 
 module.exports = router;
