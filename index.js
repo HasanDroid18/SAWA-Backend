@@ -15,7 +15,11 @@ const dashboardRouter = require("./routes/dashboardRouter");
 const createDefaultAdmin = require("./utils/createDefaultAdmin");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:4200'], // Adjust the origins as needed
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
