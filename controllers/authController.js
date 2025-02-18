@@ -113,6 +113,7 @@ exports.signin = async (req, res) => {
       .json({
         success: true,
         token,
+        userId: existingUser._id,
         message: "logged in successfully",
       });
   } catch (error) {
