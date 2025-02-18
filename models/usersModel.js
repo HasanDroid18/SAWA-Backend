@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema(
     Role: {
       type: String,
       enum: ["Admin", "SubAdmin", "User"],
-      default: "user",
+      default: "User",
     },
     userImage: {
       type: String, // URL or file path, optional in profile update
