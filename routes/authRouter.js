@@ -2,7 +2,19 @@ const express = require("express");
 const authController = require("../controllers/authController");
 const { identifier } = require("../middlewares/identification");
 const checkRole = require("../middlewares/roleCheck");
+const multer = require("multer");
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 router.post("/signup", authController.signup);
 router.post("/signin", authController.signin);
@@ -41,6 +53,13 @@ router.patch(
 router.patch(
   "/verify-forgot-password-code",
   authController.verifyForgotPasswordCode
+);
+
+router.patch(
+  "/update-profile",
+  identifier,
+  upload.single("userImage"),
+  authController.updateProfile
 );
 
 module.exports = router;

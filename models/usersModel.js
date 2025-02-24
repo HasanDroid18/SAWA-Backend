@@ -48,6 +48,11 @@ const userSchema = mongoose.Schema(
       type: Number,
       select: false,
     },
+    bloodType: {
+      type: String,
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      required: false,
+    },
   },
   {
     timestamps: true,

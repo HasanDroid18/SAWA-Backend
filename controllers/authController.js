@@ -352,9 +352,8 @@ exports.sendForgotPasswordCode = async (req, res) => {
               </div>
             </div>
           </body>
-        </html>`
+        </html>`,
     });
-    
 
     if (info.accepted.includes(existingUser.email)) {
       // Check and log the HMAC secret for debugging
@@ -539,6 +538,37 @@ exports.promoteOrDemoteUser = async (req, res) => {
       success: true,
       message: `Role updated to ${role} successfully!`,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error!" });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  const { userId } = req.user;
+  const { fullName, phoneNumber, DateOfBirth, address, bloodType } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found!" });
+    }
+
+    user.fullName = fullName || user.fullName;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.DateOfBirth = DateOfBirth || user.DateOfBirth;
+    user.address = address || user.address;
+    user.bloodType = bloodType || user.bloodType;
+    if (req.file) {
+      user.userImage = req.file.path; // Get the file path from multer
+    }
+
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Profile updated successfully!", user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error!" });

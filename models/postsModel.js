@@ -18,8 +18,7 @@ const postSchema = mongoose.Schema(
       required: true,
     },
     images: {
-      type: [String],
-      required: [true, "images are required!"],
+      type: [String]
     },
   },
   { timestamps: true }
