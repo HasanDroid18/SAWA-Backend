@@ -160,9 +160,6 @@ exports.deletePost = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Post already unavailable" });
     }
-    if (existingPost.userId.toString() !== userId) {
-      return res.status(403).json({ success: false, message: "Unauthorized" });
-    }
 
     // Delete associated images
     existingPost.images.forEach((imagePath) => {
