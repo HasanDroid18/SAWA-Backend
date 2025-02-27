@@ -42,6 +42,11 @@ exports.singlePost = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Post unavailable" });
     }
+
+    // Increment views counter
+    existingPost.views += 1;
+    await existingPost.save();
+
     res
       .status(200)
       .json({ success: true, message: "single post", data: existingPost });

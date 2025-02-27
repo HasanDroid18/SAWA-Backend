@@ -18,7 +18,11 @@ const postSchema = mongoose.Schema(
       required: true,
     },
     images: {
-      type: [String]
+      type: [String],
+    },
+    views: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
