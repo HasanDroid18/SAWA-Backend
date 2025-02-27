@@ -114,6 +114,7 @@ exports.signin = async (req, res) => {
         success: true,
         token,
         userId: existingUser._id,
+        role:existingUser.Role,
         message: "logged in successfully",
       });
   } catch (error) {
