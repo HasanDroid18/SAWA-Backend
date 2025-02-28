@@ -12,6 +12,7 @@ const authRouter = require("./routes/authRouter");
 const postsRouter = require("./routes/postsRouter");
 const donationRouter = require("./routes/donationRouter");
 const dashboardRouter = require("./routes/dashboardRouter");
+const usersRouter = require("./routes/usersRouter");
 const createDefaultAdmin = require("./utils/createDefaultAdmin");
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/donations", donationRouter);
 app.use("/api/home", dashboardRouter);
+app.use("/api/profile", usersRouter);
 
 app.get("/api/hospitals", async (req, res) => {
   try {
