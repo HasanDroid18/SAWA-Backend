@@ -12,4 +12,13 @@ router.get(
   dashboardController.getDashboardStats
 );
 
+// Get user post counts (Admin-only)
+router.get(
+  "/user-post-counts",
+  identifier,
+  checkRole(["Admin", "SubAdmin"]),
+  dashboardController.getUserPostCounts
+);
+
+
 module.exports = router;
