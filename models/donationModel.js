@@ -32,8 +32,15 @@ const donationSchema = mongoose.Schema({
     min: 0,
   },
   requestedBy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Users who requested this donation
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+    }
   }],
   donations: [{
     donor: {

@@ -28,6 +28,13 @@ router.get("/get-all-donations", donationController.getAllDonations);
 // Get a single donation by ID (Public)
 router.get("/get-donation/:id", donationController.getDonationById);
 
+// Get all donation requests (Admin)
+router.get(
+  "/get-all-requests",
+  identifier,
+  donationController.getAllRequests
+);
+
 // Delete a donation by ID (Admin and SubAdmin)
 router.delete(
   "/delete-donation/:id",
@@ -54,10 +61,25 @@ router.put(
 );
 
 // Request a donation (User)
-// router.post(
-//   "/request-donation/:id/request",
-//   donationController.requestDonation
-// );
+router.post(
+  "/request-donation/:id/request",
+  identifier,
+  donationController.requestDonation
+);
+
+// Accept a requested donation (Admin)
+router.post(
+  "/accept-request/:id",
+  identifier,
+  donationController.acceptRequest
+);
+
+// Reject a requested donation (Admin)
+router.post(
+  "/reject-request/:id",
+  identifier,
+  donationController.rejectRequest
+);
 
 // Donate for a donation item (User)
 // router.post(
